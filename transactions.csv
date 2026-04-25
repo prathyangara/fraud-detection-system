@@ -1,0 +1,16 @@
+txn_id,card_id,amount,city,channel,txn_time
+1,card_001,5000,Chennai,POS,2024-01-01 10:00:00
+2,card_001,8000,Mumbai,Online,2024-01-01 10:05:00
+3,card_002,150000,Delhi,ATM,2024-01-01 14:00:00
+4,card_003,800,Chennai,POS,2024-01-01 23:45:00
+5,card_003,1200,Chennai,Online,2024-01-01 23:50:00
+6,card_003,900,Chennai,POS,2024-01-01 23:55:00
+7,card_004,500,Bangalore,POS,2024-01-01 09:00:00
+8,card_004,999999,Dubai,Online,2024-01-01 09:10:00
+9,card_005,2000,Delhi,POS,2024-01-01 15:00:00
+10,card_005,3000,Delhi,POS,2024-01-01 15:02:00
+11,card_006,50000,Hyderabad,Online,2024-01-01 11:00:00
+12,card_006,75000,Hyderabad,Online,2024-01-01 11:30:00
+13,card_007,200,Chennai,POS,2024-01-01 08:00:00
+14,card_007,300,Chennai,POS,2024-01-01 08:03:00
+15,card_007,250,Chennai,POS,2024-01-01 08:06:00

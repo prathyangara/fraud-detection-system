@@ -1,0 +1,16 @@
+txn_id,card_id,amount,city,channel,month,fraud_status,rule1_high_amount,rule2_midnight,rule3_location_jump,rule4_velocity
+1,card_001,5000,Chennai,POS,january,OK,OK,OK,OK,OK
+2,card_001,8000,Mumbai,Online,january,FRAUD,OK,OK,LOCATION JUMP,OK
+3,card_002,150000,Delhi,ATM,january,FRAUD,HIGH AMOUNT,OK,OK,OK
+4,card_003,800,Chennai,POS,january,FRAUD,OK,MIDNIGHT,OK,OK
+5,card_003,1200,Chennai,Online,january,FRAUD,OK,MIDNIGHT,OK,OK
+6,card_004,500,Bangalore,POS,february,OK,OK,OK,OK,OK
+7,card_004,999999,Dubai,Online,february,FRAUD,HIGH AMOUNT,OK,LOCATION JUMP,OK
+8,card_005,2000,Delhi,POS,february,OK,OK,OK,OK,OK
+9,card_005,3000,Delhi,POS,february,OK,OK,OK,OK,OK
+10,card_006,50000,Hyderabad,Online,february,OK,OK,OK,OK,OK
+11,card_006,75000,Hyderabad,Online,march,OK,OK,OK,OK,OK
+12,card_007,200,Chennai,POS,march,OK,OK,OK,OK,OK
+13,card_007,300,Chennai,POS,march,OK,OK,OK,OK,OK
+14,card_007,250,Chennai,POS,march,FRAUD,OK,OK,OK,HIGH VELOCITY
+15,card_008,500000,London,Online,march,FRAUD,HIGH AMOUNT,MIDNIGHT,OK,OK

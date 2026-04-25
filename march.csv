@@ -1,0 +1,6 @@
+txn_id,card_id,amount,city,channel,txn_time
+11,card_006,75000,Hyderabad,Online,2024-03-01 11:30:00
+12,card_007,200,Chennai,POS,2024-03-01 08:00:00
+13,card_007,300,Chennai,POS,2024-03-01 08:03:00
+14,card_007,250,Chennai,POS,2024-03-01 08:06:00
+15,card_008,500000,London,Online,2024-03-01 02:30:00

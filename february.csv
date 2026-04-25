@@ -1,0 +1,6 @@
+txn_id,card_id,amount,city,channel,txn_time
+6,card_004,500,Bangalore,POS,2024-02-01 09:00:00
+7,card_004,999999,Dubai,Online,2024-02-01 09:10:00
+8,card_005,2000,Delhi,POS,2024-02-01 15:00:00
+9,card_005,3000,Delhi,POS,2024-02-01 15:02:00
+10,card_006,50000,Hyderabad,Online,2024-02-01 11:00:00
