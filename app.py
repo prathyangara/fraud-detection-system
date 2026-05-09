@@ -1,15 +1,12 @@
-import os
-os.environ["HADOOP_HOME"] = "C:\\hadoop"
-os.environ["PATH"] = os.environ["PATH"] + ";C:\\hadoop\\bin"
-
 from flask import Flask, request, jsonify, render_template_string
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+import os
 
 app = Flask(__name__)
 
-# ── Train Model ──
+# Train Model
 data = {
     "amount":          [5000,150000,800,999999,2000,3000,500000,
                         1200,75000,200,300,250,50000,8000,900,
@@ -37,7 +34,6 @@ features = ["amount","hour","is_foreign_city","channel_encoded"]
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(df[features], df["fraud"])
 
-# ── HTML Page ──
 HTML = """
 <!DOCTYPE html>
 <html>
@@ -60,32 +56,26 @@ HTML = """
     </style>
 </head>
 <body>
-    <h1>🔍 Fraud Detection AI Agent</h1>
+    <h1>Fraud Detection AI Agent</h1>
     <div class="form-box">
-        <label>Amount (₹)</label>
-        <input type="number" id="amount" placeholder="Enter amount" value="5000">
-
+        <label>Amount</label>
+        <input type="number" id="amount" value="5000">
         <label>Hour (0-23)</label>
-        <input type="number" id="hour" placeholder="Enter hour" value="10" min="0" max="23">
-
+        <input type="number" id="hour" value="10" min="0" max="23">
         <label>Channel</label>
         <select id="channel">
             <option value="POS">POS</option>
             <option value="Online">Online</option>
             <option value="ATM">ATM</option>
         </select>
-
         <label>Foreign City?</label>
         <select id="is_foreign">
             <option value="0">No</option>
             <option value="1">Yes</option>
         </select>
-
-        <button onclick="analyze()">🤖 Analyze Transaction</button>
-
+        <button onclick="analyze()">Analyze Transaction</button>
         <div id="result"></div>
     </div>
-
     <script>
         async function analyze() {
             const data = {
@@ -94,35 +84,26 @@ HTML = """
                 channel: document.getElementById('channel').value,
                 is_foreign: parseInt(document.getElementById('is_foreign').value)
             };
-
             const res = await fetch('/analyze', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-
             const result = await res.json();
             const isfraud = result.verdict === 'FRAUD';
             const cls = isfraud ? 'fraud' : 'ok';
-            const icon = isfraud ? '🚨' : '✅';
-
-            let reasonsHtml = '';
-            if (result.reasons.length > 0) {
-                reasonsHtml = '<ul>' + result.reasons.map(r => `<li>${r}</li>`).join('') + '</ul>';
-            } else {
-                reasonsHtml = '<p>No suspicious activity found.</p>';
-            }
-
-            document.getElementById('result').innerHTML = `
-                <div class="result ${cls}">
-                    <div class="verdict">${icon} ${result.verdict}</div>
-                    <p><b>Risk Score:</b> ${result.risk_score}/100</p>
-                    <p><b>Action:</b> ${result.action}</p>
-                    <p><b>Reasons:</b></p>
-                    ${reasonsHtml}
-                    <p><b>Explanation:</b> ${result.explanation}</p>
-                </div>
-            `;
+            const icon = isfraud ? 'FRAUD' : 'OK';
+            let reasonsHtml = result.reasons.length > 0
+                ? '<ul>' + result.reasons.map(r => '<li>' + r + '</li>').join('') + '</ul>'
+                : '<p>No suspicious activity.</p>';
+            document.getElementById('result').innerHTML =
+                '<div class="result ' + cls + '">' +
+                '<div class="verdict">' + icon + '</div>' +
+                '<p><b>Risk Score:</b> ' + result.risk_score + '/100</p>' +
+                '<p><b>Action:</b> ' + result.action + '</p>' +
+                '<p><b>Reasons:</b></p>' + reasonsHtml +
+                '<p><b>Explanation:</b> ' + result.explanation + '</p>' +
+                '</div>';
         }
     </script>
 </body>
@@ -137,47 +118,47 @@ def home():
 def analyze():
     txn = request.json
     channel_enc = le.transform([txn["channel"]])[0]
-    X = pd.DataFrame([[txn["amount"], txn["hour"],
-                       txn["is_foreign"], channel_enc]],
-                     columns=features)
+    X = pd.DataFrame(
+        [[txn["amount"], txn["hour"], txn["is_foreign"], channel_enc]],
+        columns=features
+    )
     pred = model.predict(X)[0]
     prob = model.predict_proba(X)[0]
     risk_score = int(prob[1] * 100)
 
     reasons = []
     if txn["amount"] > 100000:
-        reasons.append(f"High amount ₹{txn['amount']:,} (above ₹1 lakh)")
+        reasons.append("High amount above 1 lakh")
     if txn["hour"] >= 23 or txn["hour"] <= 5:
-        reasons.append(f"Suspicious time — {txn['hour']}:00 (midnight)")
+        reasons.append("Midnight transaction")
     if txn["is_foreign"] == 1:
-        reasons.append("Foreign city transaction detected")
+        reasons.append("Foreign city detected")
     if txn["channel"] == "ATM" and txn["amount"] > 50000:
-        reasons.append(f"Large ATM withdrawal ₹{txn['amount']:,}")
+        reasons.append("Large ATM withdrawal")
 
     verdict = "FRAUD" if pred == 1 else "OK"
-    action  = "BLOCK TRANSACTION" if pred == 1 else "APPROVE"
+    action = "BLOCK TRANSACTION" if pred == 1 else "APPROVE"
 
     if verdict == "FRAUD":
-        explanation = (f"This transaction shows {len(reasons)} suspicious "
-                      f"indicator(s). Risk score {risk_score}/100. "
-                      f"Immediate action: {action}.")
+        explanation = (
+            "Transaction shows " + str(len(reasons)) +
+            " suspicious indicators. Risk score " +
+            str(risk_score) + "/100. Action: " + action
+        )
     else:
-        explanation = (f"Transaction appears normal. "
-                      f"Risk score {risk_score}/100. Safe to approve.")
+        explanation = (
+            "Transaction appears normal. Risk score " +
+            str(risk_score) + "/100. Safe to approve."
+        )
 
     return jsonify({
-        "verdict"    : verdict,
-        "risk_score" : risk_score,
-        "action"     : action,
-        "reasons"    : reasons,
+        "verdict": verdict,
+        "risk_score": risk_score,
+        "action": action,
+        "reasons": reasons,
         "explanation": explanation
     })
 
 if __name__ == "__main__":
-    print("=" * 50)
-    print("  Fraud Detection Web App Starting...")
-    print("  Open browser: http://localhost:5000")
-    print("=" * 50)
-   import os
-port = int(os.environ.get("PORT", 5000))
-app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
